@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 #define CANTIDAD_MAXIMA_ITERACIONES 255
 struct complejo{
 	double real;
@@ -49,7 +50,48 @@ void escribirPrologo(FILE * archivo, struct resolucion res);
 double modulo(struct complejo z){
 	return sqrt(z.real*z.real+z.imaginario*z.imaginario);
 }
-int main (){
+int main (int argc, char** argv){
+    
+    	/* Aca se deberia chequear si la cantidad de elementos en argv es correcta */
+
+	char* datos[] = {"640x480","0 + 0i","0,285 − 0,01i", "4", "4", "-"};
+
+	for (int i = 0; i < argc; i++){
+		if (!strcmp(argv[i],"-r")){
+			datos[0] = argv[i+1];
+
+		}
+		if (!strcmp(argv[i],"-c")){
+			datos[1] = argv[i+1];
+		}
+		if (!strcmp(argv[i],"-C")){
+			datos[2] = argv[i+1];
+		}
+		if (!strcmp(argv[i],"-w")){
+			datos[3] = argv[i+1];
+		}
+		if (!strcmp(argv[i],"-H")){
+			datos[4] = argv[i+1];
+		}
+		if (!strcmp(argv[i],"-o")){
+			datos[5] = argv[i+1];
+		}
+	}
+
+	/*char* resulucionHorizontal;
+	char* resulucionVertical;
+	/*char line[] = datos[0];
+	char line[] = "640x440";
+	char *search = "x";
+
+	resulucionHorizontal = strtok(datos[0],search);
+	printf("%s \n", resulucionHorizontal);
+	
+	resulucionVertical = strtok(NULL,search);
+	printf("%s \n", resulucionVertical);*/
+
+    
+    
 	unsigned int i, j,k;
 	double anchoPlano=4,altoPlano=4;
 	struct complejo z,zc,centro;

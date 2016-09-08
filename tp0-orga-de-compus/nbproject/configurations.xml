@@ -12,7 +12,9 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>julia.c</itemPath>
       <itemPath>main.c</itemPath>
+      <itemPath>prueba0.pmg</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -39,7 +41,11 @@
           <standard>3</standard>
         </cTool>
       </compileType>
+      <item path="julia.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="main.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="prueba0.pmg" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -63,7 +69,11 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="julia.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="main.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="prueba0.pmg" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>
