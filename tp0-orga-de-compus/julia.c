@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <string.h>
 #define CANTIDAD_MAXIMA_ITERACIONES 255
@@ -17,7 +18,8 @@ struct resolucion{
 struct pixel{
 	unsigned int x;
 	unsigned int y;
-}; 
+};
+
 struct complejo multiplicarComplejos(struct complejo primerComplejo, struct complejo otroComplejo){
 	struct complejo aux;
 	aux.real=primerComplejo.real*otroComplejo.real-primerComplejo.imaginario*otroComplejo.imaginario;
@@ -50,11 +52,19 @@ void escribirPrologo(FILE * archivo, struct resolucion res);
 double modulo(struct complejo z){
 	return sqrt(z.real*z.real+z.imaginario*z.imaginario);
 }
+
+void comma_to_dot(char *input) {
+    char *ptr = NULL;
+    while(ptr = strpbrk(input, ",")) { //find the first dot in input
+        *ptr = '.'; //replace the dot with a comma
+    }
+}
+
 int main (int argc, char** argv){
     
     	/* Aca se deberia chequear si la cantidad de elementos en argv es correcta */
 
-	char* datos[] = {"640x480","0 + 0i","0,285 − 0,01i", "4", "4", "-"};
+	char* datos[] = {"640x480","0-10i","0,285-0,01i", "4", "4", "-"};
 
 	for (int i = 0; i < argc; i++){
 		if (!strcmp(argv[i],"-r")){
@@ -78,33 +88,83 @@ int main (int argc, char** argv){
 		}
 	}
 
-	/*char* resulucionHorizontal;
-	char* resulucionVertical;
-	/*char line[] = datos[0];
-	char line[] = "640x440";
-	char *search = "x";
-
-	resulucionHorizontal = strtok(datos[0],search);
-	printf("%s \n", resulucionHorizontal);
-	
-	resulucionVertical = strtok(NULL,search);
-	printf("%s \n", resulucionVertical);*/
-
-    
-    
-	unsigned int i, j,k;
-	double anchoPlano=4,altoPlano=4;
+     	unsigned int i, j,k;
+	double anchoPlano=atof(datos[3]);
+        double altoPlano=atof(datos[4]);
 	struct complejo z,zc,centro;
 	struct resolucion resolucionActual;
 	FILE * archivo;
-	archivo = fopen ( "prueba0.pmg", "w" );
-	resolucionActual.ancho=1200;
+	archivo = fopen ( datos[5], "w" );
+        
+	/*Obtiene la resolucion*/
+        
+        char* resolucionHorizontal;
+	char* resolucionVertical;
+        char* token;
+        char* line1 = (char*) malloc(12*sizeof(char));
+        strcpy(line1, datos[0]);
+        char* search = "x";
 
-	resolucionActual.alto=1024;
-	zc.real=0.285;
-	zc.imaginario=-0.01;
-	centro.real=0;
-	centro.imaginario=0;
+        resolucionHorizontal = strtok(line1, search);
+        resolucionVertical = strtok(NULL, search);
+        
+        free(line1);
+        
+        resolucionActual.ancho=atoi(resolucionHorizontal);
+	resolucionActual.alto=atoi(resolucionVertical);
+        
+        /*Obiene centro*/
+        
+        char* centroReal;
+        char* centroImaginario;
+        char* line2 = (char*) malloc(12*sizeof(char));
+        strcpy(line2, datos[1]);
+        centroReal = strtok(line2,"+");
+        centroImaginario = strtok(NULL,"+");
+        if (centroImaginario){
+            centroImaginario[strlen(centroImaginario)-1] = '\0';
+        }
+        if (!centroImaginario){
+            centroReal = strtok(line2,"-");
+            centroImaginario = strtok(NULL,"-");
+            memmove(&centroImaginario[1], &centroImaginario[0], strlen(centroImaginario)-1);
+            memmove(&centroImaginario[0], "-", 1);
+        }
+        comma_to_dot(centroReal);
+        comma_to_dot(centroImaginario);
+        
+        free(line2);
+
+     	centro.real=atof(centroReal);
+	centro.imaginario=atof(centroImaginario);
+
+        /*Obtiene parametro c*/
+        
+        char* zcReal;
+        char* zcImaginario;
+        char* line3 = (char*) malloc(12*sizeof(char));
+        strcpy(line3, datos[2]);
+        zcReal = strtok(line3,"+");
+        zcImaginario = strtok(NULL,"+");
+        if (zcImaginario){
+            zcImaginario[strlen(zcImaginario)-1] = '\0';
+        }
+        
+        if (!zcImaginario){
+            zcReal = strtok(line3,"-");
+            zcImaginario = strtok(NULL,"-");
+            memmove(&zcImaginario[1], &zcImaginario[0], strlen(zcImaginario)-1);
+            memmove(&zcImaginario[0], "-", 1);
+        }
+
+        comma_to_dot(zcReal);
+        comma_to_dot(zcImaginario);
+        
+        free(line3);
+               
+        zc.real = atof(zcReal);
+        zc.imaginario = atof(zcImaginario);
+        
 	escribirPrologo (archivo,resolucionActual);
 	for(i=0;i<resolucionActual.alto;i++){
 		for(j=0;j<resolucionActual.ancho;j++){
@@ -119,7 +179,7 @@ int main (int argc, char** argv){
 				z=sumarComplejos(z,zc);
 				k++;
 			}
-			fprintf(archivo,"%i ",k);
+			fprintf(archivo,"%u ",k);
  
 		}
 		fputs("\n",archivo);
