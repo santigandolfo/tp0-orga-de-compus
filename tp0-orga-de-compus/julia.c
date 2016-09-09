@@ -64,7 +64,7 @@ int main (int argc, char** argv){
     
     	/* Aca se deberia chequear si la cantidad de elementos en argv es correcta */
 
-	char* datos[] = {"640x480","0-10i","0,285-0,01i", "4", "4", "-"};
+	char* datos[] = {"640x480","0+0i","0,285-0,01i", "4", "4", "-"};
 
 	for (int i = 0; i < argc; i++){
 		if (!strcmp(argv[i],"-r")){
@@ -87,14 +87,19 @@ int main (int argc, char** argv){
 			datos[5] = argv[i+1];
 		}
 	}
-
+                
+        
      	unsigned int i, j,k;
 	double anchoPlano=atof(datos[3]);
         double altoPlano=atof(datos[4]);
 	struct complejo z,zc,centro;
 	struct resolucion resolucionActual;
 	FILE * archivo;
-	archivo = fopen ( datos[5], "w" );
+	if (!strcmp(datos[5],"-")){
+            archivo = stdout;
+        }else{
+            archivo = fopen ( datos[5], "w" );
+        }
         
 	/*Obtiene la resolucion*/
         
@@ -164,6 +169,11 @@ int main (int argc, char** argv){
                
         zc.real = atof(zcReal);
         zc.imaginario = atof(zcImaginario);
+        
+        printf("Resolucion: %u x %u \n",resolucionActual.ancho,resolucionActual.alto);
+        printf("Centro: (%f,%f) \n", centro.real,centro.imaginario);
+        printf("Zc: (%f,%f) \n", zc.real,zc.imaginario);
+        
         
 	escribirPrologo (archivo,resolucionActual);
 	for(i=0;i<resolucionActual.alto;i++){
