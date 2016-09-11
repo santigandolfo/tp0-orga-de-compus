@@ -1,0 +1,14 @@
+
+Manual:
+-r: permite cambiar la resolución de la imagen generada. El valor por defecto será de
+640x480 puntos.
+-c: para especificar el centro de la imagen, el punto central de la porción del plano complejo
+dibujada, expresado en forma binómica (i.e. a + bi). Por defecto usaremos 0 + 0i.
+-C: determina el parámetro c, también expresado en forma binómica. El valor por defecto
+será 0,285 − 0,01i.
+-w: especifica el ancho del rectángulo que contiene la región del plano complejo que estamos
+por dibujar. Valor por defecto: 4.
+2-H: sirve, en forma similar, para especificar el alto del rectángulo a dibujar. Valor por
+defecto: 4.
+-o: permite colocar la imagen de salida, (en formato PGM [4]) en el archivo pasado como
+argumento; o por salida estándar -stdout- si el argumento es “-”.
