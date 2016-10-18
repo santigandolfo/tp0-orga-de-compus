@@ -141,7 +141,7 @@ int main (int argc, char* argv[]){
     
     	/* Aca se deberia chequear si la cantidad de elementos en argv es correcta */
 	
-	char* datos[] = {"640x480","0+0i","0,285+0,01i", "4", "4", "-"};
+	char* datos[] = {"640x480","0+0i","0.285+0.01i", "4", "4", "-"};
      	unsigned int i, j,k;
 	int estaReconocido;
 	FILE * archivo;
@@ -245,12 +245,10 @@ int main (int argc, char* argv[]){
 		printf("\n");
 		exit(-1);
 	}
-	char* line3 = (char*) malloc(30*sizeof(char));
-        strcpy(line3, datos[2]);
 
-	comma_to_dot(line3);
-	sscanf(line3,"%lf%lfi",&(zc.real),&(zc.imaginario));
-	free(line3);
+	comma_to_dot(datos[2]);
+	sscanf(datos[2],"%lf%lfi",&(zc.real),&(zc.imaginario));
+
  	/*archivo*/
 	if (strcmp(datos[5],"-")){
             archivo = fopen ( datos[5], "w" );
