@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <ctype.h>
+
+
 #define CANTIDAD_MAXIMA_ITERACIONES 255
 struct complejo{
 	double real;
@@ -67,6 +70,61 @@ void imprimirManual(){
 int esValida(struct resolucion res){
 	return (res.alto>0&&res.ancho>0);
 }
+
+int esFormatoValidoResolucion(const char* dato){
+
+	int xEncontrada=0;
+	int i;
+	for(i=0;i<strlen(dato);i++){
+		if(!isdigit(dato[i])&&(dato[i]!='x'||xEncontrada))
+			return 0;
+		if(dato[i]=='x')
+			xEncontrada=1;
+	}
+	return (dato[0]!='x'&&dato[strlen(dato)-1]!='x'&&xEncontrada);
+}
+
+int esComplejoValido(const char* dato){
+	int indicePunto,indiceSigno;
+	int i;
+	i=0;
+	if(dato[i]=='-'||dato[i]=='+')
+		i++;
+	while(i<strlen(dato)&&isdigit(dato[i]))
+
+		i++;
+	if(i==0||i==strlen(dato))
+		return 0;
+	if(dato[i]=='.'||dato[i]==','){
+		indicePunto=i;		
+		i++;		
+		while(i<strlen(dato)&&isdigit(dato[i]))
+			i++;
+		if(i==indicePunto+1||i==strlen(dato))
+			return 0;
+	}
+	if(!(dato[i]=='+'||dato[i]=='-'))
+		return 0;
+
+	indiceSigno=i;
+	i++;
+	while(i<strlen(dato)&&isdigit(dato[i]))
+		i++;
+	if(i==indiceSigno+1||i==strlen(dato))
+		return 0;
+	if(dato[i]=='.'||dato[i]==','){
+		indicePunto=i;		
+		i++;		
+		while(i<strlen(dato)&&isdigit(dato[i]))
+			i++;
+		if(i==indicePunto+1||i==strlen(dato))
+			return 0;
+	}
+	return (dato[strlen(dato)-1]=='i');
+
+		
+
+}
 void escribirPrologo(FILE * archivo, struct resolucion res);
 double modulo(struct complejo z){
 	return sqrt(z.real*z.real+z.imaginario*z.imaginario);
@@ -82,57 +140,61 @@ void comma_to_dot(char *input) {
 int main (int argc, char* argv[]){
     
     	/* Aca se deberia chequear si la cantidad de elementos en argv es correcta */
-
+	
 	char* datos[] = {"640x480","0+0i","0,285+0,01i", "4", "4", "-"};
      	unsigned int i, j,k;
 	int estaReconocido;
 	FILE * archivo;
-	
-	i=1;
+	int indice;
+	i=1;	
 	while(i < argc){
 		estaReconocido=0;
-
+		
 		if (!strcmp(argv[i],"-r")){
-			datos[0] = argv[i+1];
+			indice=0;
 			estaReconocido=1;
-			i++;
 
 		}
 		if (!strcmp(argv[i],"-c")){
-			datos[1] = argv[i+1];
+			indice=1;
 			estaReconocido=1;
-			i++;
 		}
 		if (!strcmp(argv[i],"-C")){
-			datos[2]=argv[i+1];
+			indice=2;
 			estaReconocido=1;
-			i++;
 		}
 		if (!strcmp(argv[i],"-w")){
-			datos[3] = argv[i+1];
+			indice=3;
 			estaReconocido=1;
-			i++;
 		}
 		if (!strcmp(argv[i],"-H")){
-			datos[4] = argv[i+1];
+			indice=4;
 			estaReconocido=1;
-			i++;
 		}
 		if (!strcmp(argv[i],"-o")){
-			datos[5] = argv[i+1];
+			indice=5;
 			estaReconocido=1;
-			i++;
 		}
 		if(!estaReconocido){
-			printf("No se reconoce el comando %s, el manual de uso sera impreso a continuacion",argv[i]);
-			imprimirManual();
+			printf("No se reconoce el comando %s, el manual de uso sera impreso a continuacion\n",argv[i]);
+			//imprimirManual();
 			exit(-1);
-		}
+		}else{
+			i++;
+			if(argc<=i){
+				printf("Error de comando");	
 
+				printf("\n");
+				exit(-1);
+			}else{
+			
+			datos[indice]=argv[i];
+			}
+		}
+		
 		i++;
 	}
                 
-        
 	double anchoPlano=atof(datos[3]);
         if(!(anchoPlano>0)){
 		printf("Ancho invalido");
@@ -150,93 +212,46 @@ int main (int argc, char* argv[]){
         
 	/*Obtiene la resolucion*/
         
-        char* resolucionHorizontal;
-	char* resolucionVertical;
-        char* token;
-        char* line1 = (char*) malloc(30*sizeof(char));
-        strcpy(line1, datos[0]);
-        char* search = "x";
+     
 
-        resolucionHorizontal = strtok(line1, search);
-        resolucionVertical = strtok(NULL, search);
-        
-        free(line1);
-        
-        resolucionActual.ancho=atoi(resolucionHorizontal);
-	resolucionActual.alto=atoi(resolucionVertical);
-        if(!esValida(resolucionActual)){
+	if(!esFormatoValidoResolucion(datos[0])){
 		printf("Resolucion invalida");
+		printf("\n");
+		exit(-1);
+	}
+	sscanf(datos[0],"%dx%d", &(resolucionActual.ancho), &(resolucionActual.alto));
+
+        
+	if(!esValida(resolucionActual)){
+		printf("Resolucion invalida ");
 		printf("\n");
 		exit(-1);
 	}	
         /*Obiene centro*/
-        
-        char* centroReal;
-        char* centroImaginario;
-        char* line2 = (char*) malloc(30*sizeof(char));
-        strcpy(line2, datos[1]);
-        if(datos[1][strlen(datos[1])-1]!='i'||strlen(datos[1])<4){
-		printf("No se puede interpretar este centro");
+	
+	if(!esComplejoValido(datos[1])){
+		printf("No se puede interpretar el centro");
 		printf("\n");
 		exit(-1);
 	}
-	centroReal = strtok(line2,"+");
-        centroImaginario = strtok(NULL,"+");
-        if (centroImaginario){
-            centroImaginario[strlen(centroImaginario)-1] = '\0';
-        }
-        if (!centroImaginario){
-            centroReal = strtok(line2,"-");
-            centroImaginario = strtok(NULL,"-");
-            memmove(&centroImaginario[1], &centroImaginario[0], strlen(centroImaginario)-1);
-            memmove(&centroImaginario[0], "-", 1);
-	    if(datos[1][0]=='-'){
-            memmove(&centroReal[1], &centroReal[0], strlen(centroReal));
-            memmove(&centroReal[0], "-", 1);
-	    }
-        }
-        comma_to_dot(centroReal);
-        comma_to_dot(centroImaginario);
-        
-	free(line2);
-     	centro.real=atof(centroReal);
-	centro.imaginario=atof(centroImaginario);
 
+
+	comma_to_dot(datos[1]);
+	sscanf(datos[1],"%lf%lfi",&(centro.real),&(centro.imaginario));
         /*Obtiene parametro c*/
-        if(datos[2][strlen(datos[2])-1]!='i'||strlen(datos[2])<4){
+	
+	if(!esComplejoValido(datos[2])){
 		printf("No se puede interpretar este paramentro c");
 		printf("\n");
 		exit(-1);
 	}
-        char* zcReal;
-        char* zcImaginario;
-        char* line3 = (char*) malloc(30*sizeof(char));
+	char* line3 = (char*) malloc(30*sizeof(char));
         strcpy(line3, datos[2]);
-        zcReal = strtok(line3,"+");
-        zcImaginario = strtok(NULL,"+");
-        if (zcImaginario){
-            zcImaginario[strlen(zcImaginario)-1] = '\0';
-        }
-        
-        if (!zcImaginario){
-            zcReal = strtok(line3,"-");
-            zcImaginario = strtok(NULL,"-");
-            memmove(&zcImaginario[1], &zcImaginario[0], strlen(zcImaginario)-1);
-            memmove(&zcImaginario[0], "-", 1);
-            if(datos[2][0]=='-'){
-         	   memmove(&zcReal[1], &zcReal[0], strlen(zcReal));
-         	   memmove(&zcReal[0], "-", 1);
-	    }
-	}	
-	
-        comma_to_dot(zcReal);
-        comma_to_dot(zcImaginario);
-        
-        free(line3);
-               
-        zc.real = atof(zcReal);
-        zc.imaginario = atof(zcImaginario);
-        
+
+	comma_to_dot(line3);
+	sscanf(line3,"%lf%lfi",&(zc.real),&(zc.imaginario));
+	free(line3);
+ 	/*archivo*/
 	if (strcmp(datos[5],"-")){
             archivo = fopen ( datos[5], "w" );
         }
